@@ -3,11 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Portfolio</title>
+    <title>Sai Nrusimha Kalyan | Portfolio</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+    <script type="module" src="https://unpkg.com/@splinetool/viewer@1.11.6/build/spline-viewer.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    
     <style>
+        /* --- GLOBAL STYLES --- */
         * {
             margin: 0;
             padding: 0;
@@ -15,7 +19,8 @@
         }
 
         body {
-            font-family: 'Netflix Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            /* Netflix-like font stack */
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
             background-color: #141414;
             color: #fff;
             overflow-x: hidden;
@@ -23,7 +28,7 @@
             letter-spacing: 0.2px;
         }
 
-        /* Navigation */
+        /* --- NAVIGATION --- */
         nav {
             position: fixed;
             top: 0;
@@ -39,14 +44,16 @@
 
         nav.scrolled {
             background-color: #141414;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
         }
 
         .logo {
             font-family: 'Bebas Neue', sans-serif;
             font-size: 45px;
             font-weight: 700;
-            color: #e50914;
+            color: #e50914; /* Netflix Red */
             letter-spacing: 3px;
+            cursor: pointer;
         }
 
         .nav-links {
@@ -67,54 +74,74 @@
             color: #b3b3b3;
         }
 
-        /* Hero Section */
+        /* --- HERO SECTION (FULL SCREEN FIX) --- */
         .hero {
-            height: 80vh;
+            height: 100vh;
+            width: 100%;
             position: relative;
             display: flex;
-            flex-direction: column;
-            justify-content: center;
-            padding: 0 50px;
-            margin-top: 70px;
+            align-items: center; /* Centers text vertically */
+            justify-content: flex-start; /* Aligns text to the left */
+            padding: 0; 
             overflow: hidden;
+            background: #000;
         }
 
-        .hero-canvas {
+        /* Fix: Make the Earth fill the WHOLE screen */
+        .hero-earth-container {
             position: absolute;
-            inset: 0;
-            z-index: 0;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0; 
+        }
+
+        .hero-earth-container spline-viewer {
             width: 100%;
             height: 100%;
         }
 
+        /* Fix: Add a gradient for text readability */
         .hero-overlay {
             position: absolute;
-            inset: 0;
-            background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.8));
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.6) 50%, transparent 100%);
             z-index: 1;
+            pointer-events: none;
         }
 
+        /* Text sits on top of the background */
         .hero-content {
             position: relative;
-            z-index: 2;
+            z-index: 2; 
+            max-width: 800px;
+            padding-left: 50px; 
+            padding-right: 20px;
         }
 
         .hero h1 {
-            font-size: 50px;
+            font-size: 60px;
             margin-bottom: 20px;
-            max-width: 600px;
             font-weight: 700;
             line-height: 1.1;
+            color: #fff;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
         }
 
         .hero p {
-            font-size: 18px;
+            font-size: 20px;
             margin-bottom: 30px;
-            max-width: 500px;
-            line-height: 1.4;
+            max-width: 600px;
+            line-height: 1.5;
             font-weight: 400;
+            color: #e0e0e0;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.8);
         }
-
+        
         .hero-buttons {
             display: flex;
             gap: 15px;
@@ -128,6 +155,9 @@
             cursor: pointer;
             font-weight: bold;
             transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .btn-primary {
@@ -148,10 +178,17 @@
             background-color: rgba(109,109,110,0.4);
         }
 
-        /* Content Sections */
+        /* --- CONTENT SECTIONS --- */
         .content-section {
-            padding: 40px 50px;
+            padding: 100px 50px 50px 50px; 
             display: none;
+            min-height: 100vh;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .content-section.active {
@@ -159,12 +196,15 @@
         }
 
         .section-title {
-            font-size: 28px;
+            font-size: 32px;
             margin-bottom: 30px;
             font-weight: bold;
+            border-bottom: 2px solid #e50914;
+            display: inline-block;
+            padding-bottom: 10px;
         }
 
-        /* Row of Cards */
+        /* --- CARDS --- */
         .row {
             margin-bottom: 50px;
         }
@@ -172,45 +212,35 @@
         .row h2 {
             font-size: 20px;
             margin-bottom: 15px;
+            color: #e5e5e5;
         }
 
         .cards-container {
             display: flex;
-            gap: 10px;
+            gap: 15px;
             overflow-x: auto;
-            padding-bottom: 10px;
+            padding-bottom: 20px;
             scrollbar-width: thin;
-            scrollbar-color: #555 #141414;
-        }
-
-        .cards-container::-webkit-scrollbar {
-            height: 8px;
-        }
-
-        .cards-container::-webkit-scrollbar-track {
-            background: #141414;
-        }
-
-        .cards-container::-webkit-scrollbar-thumb {
-            background: #555;
-            border-radius: 10px;
+            scrollbar-color: #e50914 #141414;
         }
 
         .card {
-            min-width: 280px;
-            height: 160px;
+            min-width: 300px;
+            height: 180px;
             background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
-            border-radius: 6px;
+            border-radius: 4px;
             padding: 20px;
             cursor: pointer;
             transition: transform 0.3s, box-shadow 0.3s;
             position: relative;
             overflow: hidden;
+            border: 1px solid #333;
         }
 
         .card:hover {
             transform: scale(1.05);
             box-shadow: 0 8px 20px rgba(0,0,0,0.6);
+            border-color: #555;
         }
 
         .card h3 {
@@ -231,21 +261,22 @@
             right: 10px;
             width: 40px;
             height: 40px;
-            background-color: #e50914;
+            background-color: rgba(229, 9, 20, 0.2);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 20px;
+            color: #e50914;
         }
 
-        /* Resume Section */
+        /* --- RESUME --- */
         .resume-content {
-            max-width: 1000px;
+            max-width: 900px;
+            margin: 0 auto;
             background: #1a1a1a;
             padding: 40px;
             border-radius: 8px;
-            margin-bottom: 30px;
         }
 
         .resume-section {
@@ -256,10 +287,13 @@
             font-size: 22px;
             margin-bottom: 15px;
             color: #e50914;
+            font-weight: 600;
         }
 
         .resume-item {
-            margin-bottom: 20px;
+            margin-bottom: 25px;
+            padding-left: 15px;
+            border-left: 2px solid #333;
         }
 
         .resume-item h4 {
@@ -270,11 +304,20 @@
         .resume-item p {
             color: #b3b3b3;
             line-height: 1.6;
+            margin-bottom: 5px;
+        }
+        
+        .resume-item strong {
+            color: #fff;
         }
 
-        /* Contact Form */
-        .contact-form {
+        /* --- CONTACT FORM --- */
+        .contact-wrapper {
             max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .contact-form {
             background: #1a1a1a;
             padding: 40px;
             border-radius: 8px;
@@ -288,6 +331,7 @@
             display: block;
             margin-bottom: 8px;
             font-size: 14px;
+            color: #ccc;
         }
 
         .form-group input,
@@ -299,6 +343,7 @@
             border-radius: 4px;
             color: #fff;
             font-size: 14px;
+            transition: border-color 0.3s;
         }
 
         .form-group textarea {
@@ -312,7 +357,28 @@
             border-color: #e50914;
         }
 
-        /* Chatbot */
+        .contact-info {
+            margin-top: 30px;
+            padding: 20px;
+            background: #222;
+            border-radius: 8px;
+        }
+
+        .contact-info p {
+            margin-bottom: 10px;
+            color: #ccc;
+        }
+
+        .contact-info a {
+            color: #e50914;
+            text-decoration: none;
+        }
+        
+        .contact-info a:hover {
+            text-decoration: underline;
+        }
+
+        /* --- CHATBOT UI --- */
         .chatbot-button {
             position: fixed;
             bottom: 30px;
@@ -341,8 +407,8 @@
             position: fixed;
             bottom: 100px;
             right: 30px;
-            width: 400px;
-            height: 600px;
+            width: 350px;
+            height: 500px;
             background: #181818;
             border-radius: 12px;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8);
@@ -350,6 +416,7 @@
             display: none;
             flex-direction: column;
             overflow: hidden;
+            border: 1px solid #333;
         }
 
         .chatbot-container.active {
@@ -357,12 +424,14 @@
         }
 
         .chatbot-header {
-            background: #e50914;
-            padding: 20px;
+            background: #000;
+            padding: 15px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             position: relative;
+            border-bottom: 2px solid #e50914;
+            height: 60px;
         }
 
         .chatbot-canvas {
@@ -381,7 +450,7 @@
         }
 
         .chatbot-title {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 700;
         }
 
@@ -391,12 +460,6 @@
             color: #fff;
             font-size: 24px;
             cursor: pointer;
-            padding: 0;
-            width: 30px;
-            height: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
         }
 
         .chatbot-messages {
@@ -406,36 +469,13 @@
             display: flex;
             flex-direction: column;
             gap: 15px;
-        }
-
-        .chatbot-messages::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .chatbot-messages::-webkit-scrollbar-track {
-            background: #141414;
-        }
-
-        .chatbot-messages::-webkit-scrollbar-thumb {
-            background: #555;
-            border-radius: 3px;
+            background-color: #181818;
         }
 
         .message {
             display: flex;
             gap: 10px;
             animation: messageSlide 0.3s ease-out;
-        }
-
-        @keyframes messageSlide {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
         }
 
         .message.bot {
@@ -447,48 +487,55 @@
         }
 
         .message-avatar {
-            width: 32px;
-            height: 32px;
+            width: 28px;
+            height: 28px;
             border-radius: 50%;
-            background: #e50914;
+            background: #333;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 16px;
+            font-size: 14px;
             flex-shrink: 0;
+        }
+        
+        .message.bot .message-avatar {
+            background: #e50914;
         }
 
         .message-content {
-            max-width: 70%;
-            padding: 12px 16px;
-            border-radius: 16px;
+            max-width: 75%;
+            padding: 10px 14px;
+            border-radius: 14px;
             line-height: 1.4;
-            font-size: 14px;
+            font-size: 13px;
         }
 
         .message.bot .message-content {
             background: #2a2a2a;
+            border-bottom-left-radius: 2px;
         }
 
         .message.user .message-content {
             background: #e50914;
+            border-bottom-right-radius: 2px;
         }
 
         .chatbot-input-container {
-            padding: 20px;
+            padding: 15px;
             border-top: 1px solid #2a2a2a;
             display: flex;
             gap: 10px;
+            background: #181818;
         }
 
         .chatbot-input {
             flex: 1;
-            padding: 12px;
+            padding: 10px;
             background: #2a2a2a;
             border: 1px solid #3a3a3a;
             border-radius: 20px;
             color: #fff;
-            font-size: 14px;
+            font-size: 13px;
         }
 
         .chatbot-input:focus {
@@ -497,8 +544,8 @@
         }
 
         .chatbot-send {
-            width: 40px;
-            height: 40px;
+            width: 36px;
+            height: 36px;
             background: #e50914;
             border: none;
             border-radius: 50%;
@@ -507,92 +554,63 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 16px;
-            transition: background 0.3s;
+            font-size: 14px;
         }
 
         .chatbot-send:hover {
             background: #b00710;
         }
 
-        .chatbot-send:disabled {
-            background: #555;
-            cursor: not-allowed;
-        }
-
+        /* Typing Dots Animation */
         .typing-indicator {
             display: flex;
             gap: 4px;
             padding: 12px 16px;
+            background: #2a2a2a;
+            border-radius: 14px;
+            border-bottom-left-radius: 2px;
+            width: fit-content;
         }
 
         .typing-dot {
-            width: 8px;
-            height: 8px;
-            background: #666;
+            width: 6px;
+            height: 6px;
+            background: #888;
             border-radius: 50%;
             animation: typing 1.4s infinite;
         }
-
-        .typing-dot:nth-child(2) {
-            animation-delay: 0.2s;
-        }
-
-        .typing-dot:nth-child(3) {
-            animation-delay: 0.4s;
-        }
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
 
         @keyframes typing {
-            0%, 60%, 100% {
-                transform: translateY(0);
-            }
-            30% {
-                transform: translateY(-10px);
-            }
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-5px); }
         }
 
+        /* --- MOBILE RESPONSIVE --- */
         @media (max-width: 768px) {
-            nav {
-                padding: 15px 20px;
+            nav { padding: 15px 20px; }
+            .hero { padding: 0 20px; height: 100vh; }
+            .hero h1 { font-size: 32px; }
+            .hero p { font-size: 16px; }
+            .content-section { padding: 80px 20px 30px 20px; }
+            .chatbot-container { width: 90%; right: 5%; height: 60vh; }
+            .chatbot-button { bottom: 20px; right: 20px; }
+            .hero-content {
+                padding-left: 20px;
+                padding-right: 20px;
+                text-align: center; 
+                margin: 0 auto;
             }
-
-            .hero {
-                padding: 0 20px;
-                height: 70vh;
-            }
-
-            .hero h1 {
-                font-size: 32px;
-            }
-
-            .hero p {
-                font-size: 16px;
-            }
-
-            .content-section {
-                padding: 30px 20px;
-            }
-
-            .card {
-                min-width: 240px;
-            }
-
-            .chatbot-container {
-                width: 90%;
-                right: 5%;
-                height: 500px;
-            }
-
-            .chatbot-button {
-                bottom: 20px;
-                right: 20px;
+            .hero-buttons {
+                justify-content: center;
             }
         }
     </style>
 </head>
 <body>
     <nav id="navbar">
-        <div class="logo">PORTFOLIO</div>
+        <div class="logo" onclick="showSection('home')">PORTFOLIO</div>
         <div class="nav-links">
             <a onclick="showSection('home')">Home</a>
             <a onclick="showSection('projects')">Projects</a>
@@ -602,11 +620,15 @@
     </nav>
 
     <div class="hero" id="home">
-        <canvas class="hero-canvas" id="hero-canvas"></canvas>
+        <div class="hero-earth-container" id="earth-container">
+            <spline-viewer url="https://prod.spline.design/6Z9T2Zu43djgNHPb/scene.splinecode"></spline-viewer>
+        </div>
+        
         <div class="hero-overlay"></div>
+        
         <div class="hero-content">
-            <h1>Kalyan Hanumanthavajjala</h1>
-            <p>Full Stack Developer & Creative Problem Solver. Passionate about building amazing digital experiences.</p>
+            <h1>Sai Nrusimha Kalyan Hanumanthavajjala</h1>
+            <p>IT Software Engineer specializing in data integration, security, and process optimization. Passionate about building robust, secure systems and delivering effective business solutions.</p>
             <div class="hero-buttons">
                 <button class="btn btn-primary" onclick="showSection('projects')">▶ View Projects</button>
                 <button class="btn btn-secondary" onclick="showSection('resume')">ℹ More Info</button>
@@ -614,7 +636,7 @@
         </div>
     </div>
 
-    <div class="content-section active" id="projects-section">
+    <div class="content-section" id="projects-section">
         <div class="section-title">My Projects</div>
         
         <div class="row">
@@ -629,11 +651,6 @@
                     <div class="card-accent">📱</div>
                     <h3>Social Media App</h3>
                     <p>Real-time messaging and content sharing platform built with React and Node.js.</p>
-                </div>
-                <div class="card">
-                    <div class="card-accent">🎨</div>
-                    <h3>Portfolio Website</h3>
-                    <p>Responsive portfolio design with modern animations and interactive elements.</p>
                 </div>
                 <div class="card">
                     <div class="card-accent">🔧</div>
@@ -654,33 +671,12 @@
                 <div class="card">
                     <div class="card-accent">💰</div>
                     <h3>Expense Tracker</h3>
-                    <p>Personal finance management tool with data visualization and budget planning.</p>
+                    <p>Personal finance management tool with data visualization.</p>
                 </div>
                 <div class="card">
                     <div class="card-accent">📊</div>
                     <h3>Analytics Dashboard</h3>
                     <p>Data visualization platform with interactive charts and real-time updates.</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="row">
-            <h2>Mobile & Responsive</h2>
-            <div class="cards-container">
-                <div class="card">
-                    <div class="card-accent">🎮</div>
-                    <h3>Gaming Platform</h3>
-                    <p>Multiplayer gaming interface with leaderboards and user profiles.</p>
-                </div>
-                <div class="card">
-                    <div class="card-accent">📚</div>
-                    <h3>Learning Management</h3>
-                    <p>Educational platform with course management and progress tracking.</p>
-                </div>
-                <div class="card">
-                    <div class="card-accent">🎵</div>
-                    <h3>Music Streaming UI</h3>
-                    <p>Modern music player interface with playlist creation and recommendations.</p>
                 </div>
             </div>
         </div>
@@ -691,73 +687,77 @@
         <div class="resume-content">
             <div class="resume-section">
                 <h3>About Me</h3>
-                <p>Passionate developer with 5+ years of experience in creating web applications. Specialized in modern JavaScript frameworks and cloud technologies.</p>
+                <p>IT Software Engineer with demonstrated expertise in integrating data systems and optimizing processes using Agile and SDLC methodologies. Led initiatives that streamlined workflows and improved stakeholder coordination while ensuring data integrity and compliance.</p>
             </div>
 
             <div class="resume-section">
                 <h3>Experience</h3>
                 <div class="resume-item">
-                    <h4>Senior Full Stack Developer</h4>
-                    <p><strong>Tech Company Inc.</strong> | 2021 - Present</p>
-                    <p>Led development of enterprise-level applications, mentored junior developers, and implemented best practices for code quality.</p>
+                    <h4>IT Software Engineer</h4>
+                    <p><strong>Zircoo Corporation</strong> | Sep 2024 - Present | Dayton, OH (Remote)</p>
+                    <p>Integrated data from ERP and non-ERP systems into SharePoint using Power tools, enhancing decision-making efficiency by 30%. Verified SAP reporting accuracy ensuring 100% data integrity. Automated 20+ data workflows with Vertex and Alteryx.</p>
                 </div>
                 <div class="resume-item">
-                    <h4>Frontend Developer</h4>
-                    <p><strong>Digital Agency</strong> | 2019 - 2021</p>
-                    <p>Built responsive web applications for various clients, focusing on user experience and performance optimization.</p>
+                    <h4>Software Process Management (GA)</h4>
+                    <p><strong>University of Dayton</strong> | Jan 2023 - May 2024 | Dayton, OH</p>
+                    <p>Mentored 120+ students in Agile methodologies, SDLC tools (JIRA/Confluence), and Tableau analytics. Directed Agile transformations that accelerated delivery speed by 40%.</p>
+                </div>
+                <div class="resume-item">
+                    <h4>Associate Product Integration Specialist</h4>
+                    <p><strong>Darwinbox Pvt Ltd</strong> | May 2021 - Jul 2022 | Hyderabad, India</p>
+                    <p>Engineered REST API integrations between HCM product and 30+ client career pages. Implemented data encryption ensuring 100% compliance with security standards.</p>
                 </div>
             </div>
 
             <div class="resume-section">
-                <h3>Education</h3>
-                <div class="resume-item">
-                    <h4>Bachelor of Science in Computer Science</h4>
-                    <p><strong>University Name</strong> | 2015 - 2019</p>
-                </div>
-            </div>
-
-            <div class="resume-section">
-                <h3>Skills</h3>
-                <p>JavaScript, React, Node.js, Python, MongoDB, PostgreSQL, AWS, Docker, Git, Agile Development</p>
+                <h3>Technical Skills</h3>
+                <p><strong>Programming:</strong> Python, Java, JavaScript, C, Shell Scripting</p>
+                <p><strong>Tools:</strong> Wireshark, Nmap, Splunk, Docker, Kubernetes, JIRA, AWS, Azure</p>
+                <p><strong>Database:</strong> MySQL, PostgreSQL, MongoDB</p>
+                <p><strong>Security:</strong> Threat Analysis, Vulnerability Assessment, Encryption, SSL/TLS</p>
             </div>
         </div>
     </div>
 
     <div class="content-section" id="contact-section">
         <div class="section-title">Get In Touch</div>
-        <div class="contact-form">
-            <form id="contact-form" onsubmit="handleContactSubmit(event)">
-                <div class="form-group">
-                    <label>Name</label>
-                    <input type="text" id="contact-name" placeholder="Your name" required>
-                </div>
-                <div class="form-group">
-                    <label>Email</label>
-                    <input type="email" id="contact-email" placeholder="your.email@example.com" required>
-                </div>
-                <div class="form-group">
-                    <label>Message</label>
-                    <textarea id="contact-message" placeholder="Tell me about your project..." required></textarea>
-                </div>
-                <button type="submit" class="btn btn-primary" id="contact-submit-btn">Send Message</button>
-                <div id="contact-status" style="margin-top: 15px; font-size: 14px;"></div>
-            </form>
-        </div>
-        <div style="margin-top: 30px;">
-            <p><strong>Email:</strong> your.email@example.com</p>
-            <p><strong>LinkedIn:</strong> linkedin.com/in/yourprofile</p>
-            <p><strong>GitHub:</strong> github.com/yourusername</p>
+        <div class="contact-wrapper">
+            <div class="contact-form">
+                <form id="contact-form" onsubmit="handleContactSubmit(event)">
+                    <div class="form-group">
+                        <label>Name</label>
+                        <input type="text" id="contact-name" placeholder="Your name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="contact-email" placeholder="your.email@example.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Message</label>
+                        <textarea id="contact-message" placeholder="Tell me about your project..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary" id="contact-submit-btn">Send Message</button>
+                    <div id="contact-status" style="margin-top: 15px; font-size: 14px;"></div>
+                </form>
+            </div>
+            
+            <div class="contact-info">
+                <p><strong>Email:</strong> hsnkalyan@gmail.com</p>
+                <p><strong>Phone:</strong> +1 (937) 610-8371</p>
+                <p><strong>LinkedIn:</strong> <a href="https://linkedin.com/in/hsnkalyan" target="_blank">linkedin.com/in/hsnkalyan</a></p>
+                <p><strong>GitHub:</strong> <a href="https://github.com/kalyanhsn" target="_blank">github.com/kalyanhsn</a></p>
+                <p><strong>Location:</strong> Dayton, OH</p>
+            </div>
         </div>
     </div>
 
-    <!-- Chatbot -->
     <button class="chatbot-button" onclick="toggleChatbot()">💬</button>
     
     <div class="chatbot-container" id="chatbot">
         <div class="chatbot-header">
             <canvas class="chatbot-canvas" id="chatbot-canvas"></canvas>
             <div class="chatbot-header-content">
-                <div class="chatbot-title">Chat with Me</div>
+                <div class="chatbot-title">Portfolio AI Assistant</div>
                 <button class="chatbot-close" onclick="toggleChatbot()">×</button>
             </div>
         </div>
@@ -765,7 +765,7 @@
             <div class="message bot">
                 <div class="message-avatar">🤖</div>
                 <div class="message-content">
-                    Hi! I'm your portfolio assistant. I can help you learn more about my work, skills, or connect you with me. How can I help you today?
+                    Hi! I'm Sai's virtual assistant. Ask me about his <b>Skills</b>, <b>Projects</b>, or <b>Experience</b>!
                 </div>
             </div>
         </div>
@@ -781,437 +781,29 @@
         </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script>
-        // Three.js Background Animation for Hero
-        const canvas = document.getElementById('hero-canvas');
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
-        
-        renderer.setSize(canvas.clientWidth, canvas.clientHeight);
-        renderer.setPixelRatio(window.devicePixelRatio);
-
-        // Create particles
-        const particlesGeometry = new THREE.BufferGeometry();
-        const particlesCount = 3000;
-        const posArray = new Float32Array(particlesCount * 3);
-
-        for(let i = 0; i < particlesCount * 3; i++) {
-            posArray[i] = (Math.random() - 0.5) * 100;
-        }
-
-        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
-
-        const particlesMaterial = new THREE.PointsMaterial({
-            size: 0.15,
-            color: 0xe50914,
-            transparent: true,
-            opacity: 0.8,
-            blending: THREE.AdditiveBlending
-        });
-
-        const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
-        scene.add(particlesMesh);
-
-        camera.position.z = 30;
-
-        // Animation
-        let mouseX = 0;
-        let mouseY = 0;
-        let targetX = 0;
-        let targetY = 0;
-
-        document.addEventListener('mousemove', (e) => {
-            targetX = (e.clientX / window.innerWidth) * 2 - 1;
-            targetY = -(e.clientY / window.innerHeight) * 2 + 1;
-        });
-
-        function animate() {
-            requestAnimationFrame(animate);
-            
-            // Smooth mouse follow
-            mouseX += (targetX - mouseX) * 0.05;
-            mouseY += (targetY - mouseY) * 0.05;
-            
-            particlesMesh.rotation.x += 0.0005;
-            particlesMesh.rotation.y += 0.0008;
-            
-            // Enhanced mouse interaction with position offset
-            particlesMesh.rotation.x += mouseY * 0.003;
-            particlesMesh.rotation.y += mouseX * 0.003;
-            
-            // Move particles based on mouse position
-            particlesMesh.position.x = mouseX * 2;
-            particlesMesh.position.y = mouseY * 2;
-
-            renderer.render(scene, camera);
-        }
-
-        animate();
-
-        // Handle resize
-        window.addEventListener('resize', () => {
+        // --- NAVIGATION LOGIC ---
+        function showSection(sectionId) {
             const hero = document.getElementById('home');
-            camera.aspect = hero.clientWidth / hero.clientHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(hero.clientWidth, hero.clientHeight);
-        });
-
-        // Three.js Background for Chatbot Header
-        function initChatbotCanvas() {
-            const chatCanvas = document.getElementById('chatbot-canvas');
-            const chatScene = new THREE.Scene();
-            const chatCamera = new THREE.PerspectiveCamera(75, chatCanvas.clientWidth / chatCanvas.clientHeight, 0.1, 1000);
-            const chatRenderer = new THREE.WebGLRenderer({ canvas: chatCanvas, alpha: true, antialias: true });
+            const allSections = document.querySelectorAll('.content-section');
             
-            chatRenderer.setSize(chatCanvas.clientWidth, chatCanvas.clientHeight);
-            chatRenderer.setPixelRatio(window.devicePixelRatio);
+            // Scroll to the top when navigating
+            window.scrollTo({ top: 0, behavior: 'smooth' });
 
-            const chatParticlesGeometry = new THREE.BufferGeometry();
-            const chatParticlesCount = 500;
-            const chatPosArray = new Float32Array(chatParticlesCount * 3);
-
-            for(let i = 0; i < chatParticlesCount * 3; i++) {
-                chatPosArray[i] = (Math.random() - 0.5) * 20;
-            }
-
-            chatParticlesGeometry.setAttribute('position', new THREE.BufferAttribute(chatPosArray, 3));
-
-            const chatParticlesMaterial = new THREE.PointsMaterial({
-                size: 0.1,
-                color: 0xffffff,
-                transparent: true,
-                opacity: 0.6,
-                blending: THREE.AdditiveBlending
-            });
-
-            const chatParticlesMesh = new THREE.Points(chatParticlesGeometry, chatParticlesMaterial);
-            chatScene.add(chatParticlesMesh);
-
-            chatCamera.position.z = 10;
-
-            let chatMouseX = 0;
-            let chatMouseY = 0;
-            let chatTargetX = 0;
-            let chatTargetY = 0;
-
-            const chatbot = document.getElementById('chatbot');
-            chatbot.addEventListener('mousemove', (e) => {
-                const rect = chatbot.getBoundingClientRect();
-                chatTargetX = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-                chatTargetY = -((e.clientY - rect.top) / rect.height) * 2 + 1;
-            });
-
-            function animateChatbot() {
-                requestAnimationFrame(animateChatbot);
-                
-                // Smooth mouse follow
-                chatMouseX += (chatTargetX - chatMouseX) * 0.05;
-                chatMouseY += (chatTargetY - chatMouseY) * 0.05;
-                
-                chatParticlesMesh.rotation.x += 0.001;
-                chatParticlesMesh.rotation.y += 0.002;
-                
-                // Mouse interaction
-                chatParticlesMesh.rotation.x += chatMouseY * 0.002;
-                chatParticlesMesh.rotation.y += chatMouseX * 0.002;
-                chatParticlesMesh.position.x = chatMouseX * 1;
-                chatParticlesMesh.position.y = chatMouseY * 1;
-                
-                chatRenderer.render(chatScene, chatCamera);
-            }
-
-            animateChatbot();
-        }
-
-        // Chatbot functionality
-        let isChatbotOpen = false;
-
-        function toggleChatbot() {
-            const chatbot = document.getElementById('chatbot');
-            isChatbotOpen = !isChatbotOpen;
-            
-            if (isChatbotOpen) {
-                chatbot.classList.add('active');
-                if (!chatbot.dataset.initialized) {
-                    initChatbotCanvas();
-                    chatbot.dataset.initialized = 'true';
-                }
+            if (sectionId === 'home') {
+                hero.style.display = 'flex';
+                allSections.forEach(s => s.classList.remove('active'));
             } else {
-                chatbot.classList.remove('active');
-            }
-        }
-
-        function addMessage(content, isUser = false) {
-            const messagesContainer = document.getElementById('chatbot-messages');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${isUser ? 'user' : 'bot'}`;
-            
-            const avatar = document.createElement('div');
-            avatar.className = 'message-avatar';
-            avatar.textContent = isUser ? '👤' : '🤖';
-            
-            const messageContent = document.createElement('div');
-            messageContent.className = 'message-content';
-            messageContent.textContent = content;
-            
-            if (isUser) {
-                messageDiv.appendChild(messageContent);
-                messageDiv.appendChild(avatar);
-            } else {
-                messageDiv.appendChild(avatar);
-                messageDiv.appendChild(messageContent);
-            }
-            
-            messagesContainer.appendChild(messageDiv);
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        }
-
-        function showTypingIndicator() {
-            const messagesContainer = document.getElementById('chatbot-messages');
-            const typingDiv = document.createElement('div');
-            typingDiv.className = 'message bot';
-            typingDiv.id = 'typing-indicator';
-            
-            const avatar = document.createElement('div');
-            avatar.className = 'message-avatar';
-            avatar.textContent = '🤖';
-            
-            const typingContent = document.createElement('div');
-            typingContent.className = 'typing-indicator';
-            typingContent.innerHTML = '<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
-            
-            typingDiv.appendChild(avatar);
-            typingDiv.appendChild(typingContent);
-            messagesContainer.appendChild(typingDiv);
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        }
-
-        function removeTypingIndicator() {
-            const typingIndicator = document.getElementById('typing-indicator');
-            if (typingIndicator) {
-                typingIndicator.remove();
-            }
-        }
-
-        async function sendMessage() {
-            const input = document.getElementById('chatbot-input');
-            const sendBtn = document.getElementById('send-btn');
-            const userMessage = input.value.trim();
-            
-            if (!userMessage) return;
-            
-            addMessage(userMessage, true);
-            input.value = '';
-            sendBtn.disabled = true;
-            
-            // Check for common patterns and provide instant responses
-            const lowerMessage = userMessage.toLowerCase();
-            
-            // Simple greeting responses
-            if (lowerMessage === 'hi' || lowerMessage === 'hello' || lowerMessage === 'hey') {
-                setTimeout(() => {
-                    removeTypingIndicator();
-                    addMessage("Hey there! 👋 I'm here to help you learn about this portfolio. What would you like to know - projects, skills, experience, or how to get in touch?");
-                    sendBtn.disabled = false;
-                }, 800);
-                showTypingIndicator();
-                return;
-            }
-            
-            if (lowerMessage.includes('how are you') || lowerMessage === 'how are you?') {
-                setTimeout(() => {
-                    removeTypingIndicator();
-                    addMessage("I'm doing great, thanks for asking! 😊 I'm excited to tell you about this amazing portfolio. What would you like to explore?");
-                    sendBtn.disabled = false;
-                }, 800);
-                showTypingIndicator();
-                return;
-            }
-            
-            if (lowerMessage.includes('thank') || lowerMessage.includes('thanks')) {
-                setTimeout(() => {
-                    removeTypingIndicator();
-                    addMessage("You're very welcome! Feel free to ask me anything else about the portfolio, or check out the Contact page to get in touch directly. 😊");
-                    sendBtn.disabled = false;
-                }, 800);
-                showTypingIndicator();
-                return;
-            }
-            
-            if (lowerMessage.includes('bye') || lowerMessage === 'goodbye') {
-                setTimeout(() => {
-                    removeTypingIndicator();
-                    addMessage("Thanks for chatting! Don't forget to check out the projects and feel free to reach out through the Contact page. Have a great day! 👋");
-                    sendBtn.disabled = false;
-                }, 800);
-                showTypingIndicator();
-                return;
-            }
-            
-            showTypingIndicator();
-            
-            try {
-                const response = await fetch('https://api.anthropic.com/v1/messages', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        model: 'claude-sonnet-4-20250514',
-                        max_tokens: 1000,
-                        system: 'You are a friendly and helpful portfolio assistant chatbot for a web developer/designer. Your personality is warm, professional, and conversational.\n\nKEY INFORMATION TO SHARE:\n- Owner is a Full Stack Developer with 5+ years of experience\n- Specializes in React, Node.js, Python, MongoDB, PostgreSQL, AWS, Docker\n- Has worked on e-commerce platforms, social media apps, task management tools, and data visualization projects\n- Currently working as Senior Full Stack Developer at Tech Company Inc. since 2021\n- Previously worked as Frontend Developer at Digital Agency (2019-2021)\n- Has a Bachelor\'s degree in Computer Science\n- Available for freelance projects and consultations\n\nYOUR BEHAVIOR:\n1. Be conversational and friendly - greet users warmly, use their tone\n2. Answer questions about skills, projects, experience, and background\n3. If asked about specific projects, describe them enthusiastically with technical details\n4. For contact requests, guide users to the Contact page/form\n5. Handle casual conversation naturally (greetings, how are you, thanks, etc.)\n6. Keep responses concise (2-4 sentences) but informative\n7. Show personality - be encouraging and positive about the portfolio owner\'s work\n8. If you don\'t know something specific, be honest but helpful\n\nEXAMPLES:\n- "Hi" → "Hey there! 👋 I\'m here to help you learn about this portfolio. What would you like to know?"\n- "What skills?" → "Great question! The main expertise includes React, Node.js, Python, and cloud technologies like AWS and Docker. There\'s also strong experience with databases like MongoDB and PostgreSQL. Want to know about any specific technology?"\n- "Tell me about projects" → "There are some really cool projects here! From a full-stack e-commerce platform with payment integration to a real-time social media app. There\'s also a task management tool with drag-and-drop features. Which type of project interests you most?"\n- "How to contact?" → "I\'d love to connect you! Just click on the \'Contact\' link in the navigation above, or I can guide you there. You\'ll find a contact form and all the ways to get in touch."',
-                        messages: [
-                            { role: 'user', content: userMessage }
-                        ]
-                    })
-                });
-
-                const data = await response.json();
-                removeTypingIndicator();
-                
-                if (data.content && data.content[0]) {
-                    const botResponse = data.content[0].text;
-                    addMessage(botResponse);
-                    
-                    // Check if response mentions contact and offer to navigate
-                    if (botResponse.toLowerCase().includes('contact') || 
-                        botResponse.toLowerCase().includes('get in touch') ||
-                        botResponse.toLowerCase().includes('reach out')) {
-                        setTimeout(() => {
-                            addMessage("Would you like me to take you to the contact page? Just say 'yes' or 'take me to contact' and I'll navigate you there! 🚀");
-                        }, 1000);
+                hero.style.display = 'none';
+                allSections.forEach(s => {
+                    s.classList.remove('active');
+                    if (s.id === sectionId + '-section') {
+                        s.classList.add('active');
                     }
-                } else {
-                    addMessage("I'm having trouble responding right now. Please try again or use the contact form to reach out directly.");
-                }
-            } catch (error) {
-                removeTypingIndicator();
-                console.error('Chat error:', error);
-                addMessage("I'm having trouble connecting right now. Please try the contact form or try again later.");
-            }
-            
-            sendBtn.disabled = false;
-        }
-
-        function handleChatKeyPress(event) {
-            if (event.key === 'Enter') {
-                sendMessage();
-            }
-        }
-
-        // Check for navigation requests
-        function checkForNavigation(message) {
-            const lower = message.toLowerCase();
-            if ((lower.includes('yes') || lower.includes('take me') || lower.includes('go to')) && 
-                (lower.includes('contact') || lower.includes('there'))) {
-                setTimeout(() => {
-                    addMessage("Perfect! Taking you to the Contact page now... 🚀");
-                    setTimeout(() => {
-                        toggleChatbot();
-                        showSection('contact');
-                    }, 1000);
-                }, 500);
-                return true;
-            }
-            return false;
-        }
-
-        // Override sendMessage to check for navigation
-        const originalSendMessage = sendMessage;
-        sendMessage = function() {
-            const input = document.getElementById('chatbot-input');
-            const userMessage = input.value.trim().toLowerCase();
-            
-            // Check if user wants to navigate before processing
-            if (checkForNavigation(userMessage)) {
-                const sendBtn = document.getElementById('send-btn');
-                addMessage(input.value, true);
-                input.value = '';
-                return;
-            }
-            
-            originalSendMessage();
-        };
-
-        // Contact Form Handler
-        async function handleContactSubmit(event) {
-            event.preventDefault();
-            
-            const submitBtn = document.getElementById('contact-submit-btn');
-            const statusDiv = document.getElementById('contact-status');
-            const name = document.getElementById('contact-name').value;
-            const email = document.getElementById('contact-email').value;
-            const message = document.getElementById('contact-message').value;
-            
-            // Disable button and show loading
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Sending...';
-            statusDiv.textContent = '';
-            statusDiv.style.color = '#fff';
-            
-            // OPTION 1: Web3Forms (No verification needed!)
-            // Get your access key from: https://web3forms.com/
-            const web3formsKey = 'YOUR_WEB3FORMS_ACCESS_KEY'; // Get free key from web3forms.com
-            
-            // OPTION 2: Your email for mailto fallback
-            const yourEmail = 'YOUR_EMAIL_HERE@example.com';
-            
-            try {
-                // Using Web3Forms API
-                const response = await fetch('https://api.web3forms.com/submit', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        access_key: web3formsKey,
-                        name: name,
-                        email: email,
-                        message: message,
-                        subject: `New Portfolio Contact from ${name}`
-                    })
                 });
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    statusDiv.style.color = '#4CAF50';
-                    statusDiv.innerHTML = '✓ Message sent successfully! I\'ll get back to you soon.';
-                    document.getElementById('contact-form').reset();
-                } else {
-                    throw new Error(result.message || 'Failed to send');
-                }
-            } catch (error) {
-                console.error('Contact form error:', error);
-                
-                // Fallback to mailto
-                const subject = encodeURIComponent(`Portfolio Contact from ${name}`);
-                const body = encodeURIComponent(
-                    `Name: ${name}\n` +
-                    `Email: ${email}\n` +
-                    `Message:\n${message}\n\n` +
-                    `---\nSent from Portfolio Contact Form`
-                );
-                const mailtoLink = `mailto:${yourEmail}?subject=${subject}&body=${body}`;
-                
-                statusDiv.style.color = '#ffa500';
-                statusDiv.innerHTML = `
-                    ⚠️ Using email client fallback.<br>
-                    <a href="${mailtoLink}" style="color: #e50914; text-decoration: underline; cursor: pointer;">Click here to open your email client</a><br>
-                    <small>Or email directly: ${yourEmail}</small>
-                `;
             }
-            
-            // Re-enable button
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Send Message';
         }
 
-        // Navbar scroll effect
         window.addEventListener('scroll', () => {
             const navbar = document.getElementById('navbar');
             if (window.scrollY > 50) {
@@ -1221,29 +813,189 @@
             }
         });
 
-        // Section navigation
-        function showSection(section) {
-            const sections = ['projects-section', 'resume-section', 'contact-section'];
-            const hero = document.getElementById('home');
+        // --- THREE.JS BACKGROUND FOR CHAT HEADER ---
+        function initChatbotCanvas() {
+            const chatCanvas = document.getElementById('chatbot-canvas');
+            if(!chatCanvas) return;
             
-            if (section === 'home') {
-                hero.style.display = 'flex';
-                sections.forEach(s => {
-                    document.getElementById(s).classList.remove('active');
-                });
-            } else {
-                hero.style.display = 'none';
-                sections.forEach(s => {
-                    const sectionId = section + '-section';
-                    if (s === sectionId) {
-                        document.getElementById(s).classList.add('active');
-                    } else {
-                        document.getElementById(s).classList.remove('active');
-                    }
-                });
+            const chatScene = new THREE.Scene();
+            const chatCamera = new THREE.PerspectiveCamera(75, chatCanvas.clientWidth / chatCanvas.clientHeight, 0.1, 1000);
+            const chatRenderer = new THREE.WebGLRenderer({ canvas: chatCanvas, alpha: true, antialias: true });
+            
+            chatRenderer.setSize(chatCanvas.clientWidth, chatCanvas.clientHeight);
+            
+            const particlesGeo = new THREE.BufferGeometry();
+            const particlesCount = 300;
+            const posArray = new Float32Array(particlesCount * 3);
+
+            for(let i = 0; i < particlesCount * 3; i++) {
+                posArray[i] = (Math.random() - 0.5) * 10;
             }
+
+            particlesGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+            const material = new THREE.PointsMaterial({ size: 0.05, color: 0xe50914, transparent: true, opacity: 0.8 });
+            const mesh = new THREE.Points(particlesGeo, material);
             
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            chatScene.add(mesh);
+            chatCamera.position.z = 5;
+
+            function animate() {
+                requestAnimationFrame(animate);
+                mesh.rotation.x += 0.001;
+                mesh.rotation.y += 0.002;
+                chatRenderer.render(chatScene, chatCamera);
+            }
+            animate();
+        }
+
+        // --- CHATBOT LOGIC (SIMULATED AI) ---
+        let isChatbotOpen = false;
+
+        function toggleChatbot() {
+            const chatbot = document.getElementById('chatbot');
+            isChatbotOpen = !isChatbotOpen;
+            if (isChatbotOpen) {
+                chatbot.classList.add('active');
+                if (!chatbot.dataset.initialized) {
+                    // Initialize Three.js canvas only when opened first time
+                    initChatbotCanvas();
+                    chatbot.dataset.initialized = 'true';
+                }
+            } else {
+                chatbot.classList.remove('active');
+            }
+        }
+
+        function handleChatKeyPress(e) {
+            if (e.key === 'Enter') sendMessage();
+        }
+
+        function addMessage(text, isUser) {
+            const container = document.getElementById('chatbot-messages');
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `message ${isUser ? 'user' : 'bot'}`;
+            
+            const avatar = document.createElement('div');
+            avatar.className = 'message-avatar';
+            avatar.textContent = isUser ? '👤' : '🤖';
+
+            const content = document.createElement('div');
+            content.className = 'message-content';
+            content.innerHTML = text; 
+
+            if (isUser) {
+                msgDiv.appendChild(content);
+                msgDiv.appendChild(avatar);
+            } else {
+                msgDiv.appendChild(avatar);
+                msgDiv.appendChild(content);
+            }
+
+            container.appendChild(msgDiv);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function showTyping() {
+            const container = document.getElementById('chatbot-messages');
+            const typeDiv = document.createElement('div');
+            typeDiv.className = 'message bot';
+            typeDiv.id = 'typing-indicator';
+            typeDiv.innerHTML = `
+                <div class="message-avatar">🤖</div>
+                <div class="typing-indicator">
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                </div>`;
+            container.appendChild(typeDiv);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function removeTyping() {
+            const el = document.getElementById('typing-indicator');
+            if (el) el.remove();
+        }
+
+        function getBotResponse(input) {
+            input = input.toLowerCase();
+            
+            if (input.includes('hi') || input.includes('hello')) 
+                return "Hello! 👋 I can tell you about Sai's <b>projects</b>, <b>skills</b>, or how to <b>contact</b> him.";
+            
+            if (input.includes('skill') || input.includes('tech') || input.includes('programming'))
+                return "Sai is proficient in **Python, Java, and JavaScript**. He has expertise in cloud infrastructure (AWS, Azure) and Security/DevOps tools like Docker, Kubernetes, Splunk, and Wireshark. Check the Resume section for a full list!";
+
+            if (input.includes('project'))
+                return "Sai has led projects in **Full-stack E-Commerce**, a **Social Media App**, and large-scale **Data Integration** (ETL). Take a scroll through the 'Projects' section for more details!";
+
+            if (input.includes('experience') || input.includes('work') || input.includes('job'))
+                return "He currently works as an **IT Software Engineer** at Zircoo Corp, focusing on data integration and process automation. He also previously held roles in Product Integration and Python Development.";
+                
+            if (input.includes('contact') || input.includes('email') || input.includes('hire')) {
+                setTimeout(() => showSection('contact'), 1500);
+                return "You can reach him at hsnkalyan@gmail.com. I'll take you to the contact section now! 🚀";
+            }
+
+            if (input.includes('dayton') || input.includes('university')) 
+                return "Sai earned his MS in Computer Science from the University of Dayton and also worked there as a Software Process Management GA.";
+
+            if (input.includes('bye') || input.includes('thanks')) return "Thanks for chatting! Feel free to reach out anytime. 👋";
+
+            return "I'm not sure about that, but Sai is a specialist in **Data Integration, SAP Reporting, and Cybersecurity**. Try asking about those topics!";
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('chatbot-input');
+            const text = input.value.trim();
+            if (!text) return;
+
+            addMessage(text, true);
+            input.value = '';
+            showTyping();
+
+            setTimeout(() => {
+                removeTyping();
+                const response = getBotResponse(text);
+                addMessage(response, false);
+            }, 1000);
+        }
+
+        // --- CONTACT FORM HANDLER ---
+        function handleContactSubmit(e) {
+            e.preventDefault();
+            const status = document.getElementById('contact-status');
+            const btn = document.getElementById('contact-submit-btn');
+            
+            btn.disabled = true;
+            btn.textContent = "Sending...";
+
+            // NOTE: This uses the mailto fallback since a backend server is not available.
+            
+            setTimeout(() => {
+                const name = document.getElementById('contact-name').value;
+                const email = document.getElementById('contact-email').value;
+                const message = document.getElementById('contact-message').value;
+                
+                const subject = encodeURIComponent(`Portfolio Contact from ${name}`);
+                const body = encodeURIComponent(
+                    `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`
+                );
+                
+                const mailtoLink = `mailto:hsnkalyan@gmail.com?subject=${subject}&body=${body}`;
+                
+                status.style.color = "#ffa500";
+                status.innerHTML = `
+                    ⚠️ Email client opened for sending.<br>
+                    <a href="${mailtoLink}" style="color: #e50914; text-decoration: underline; cursor: pointer;">Click here if your client didn't open</a>
+                `;
+                
+                // Open email client
+                window.location.href = mailtoLink;
+                
+                btn.disabled = false;
+                btn.textContent = "Send Message";
+                // Don't reset the form right away in case they need to copy the message
+            }, 1000);
         }
     </script>
 </body>
