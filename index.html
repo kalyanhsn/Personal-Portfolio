@@ -304,7 +304,11 @@
         window.addEventListener('load', () => { if (!document.querySelector('.content-section.active')) { document.body.classList.add('no-scroll'); } });
         window.addEventListener('scroll', () => { const navbar = document.getElementById('navbar'); if (window.scrollY > 50) { navbar.classList.add('scrolled'); } else { navbar.classList.remove('scrolled'); } });
 
-        // --- CHATBOT LOGIC (Integrated with Netlify Functions) ---
+        // --- CHATBOT LOGIC (Connecting to DEPLOYED Netlify Backend) ---
+        
+        // 👇 THIS IS THE FIX: WE POINT TO YOUR DEPLOYED BACKEND URL
+        const CHATBOT_API_URL = "https://kalyanhsn-github-io-ai-chatbot.netlify.app";
+
         let conversationHistory = [];
         let userLocation = { city: "Unknown", country_name: "Unknown" };
         let isChatInitialized = false;
@@ -323,8 +327,8 @@
         function initChat() {
             if (isChatInitialized) return;
             
-            // 1. Fetch Location (Securely via Netlify Function)
-            fetch('/.netlify/functions/location')
+            // 1. Fetch Location (From Deployed Backend)
+            fetch(`${CHATBOT_API_URL}/.netlify/functions/location`)
                 .then(res => res.json())
                 .then(data => {
                     if(data.city) {
@@ -335,7 +339,6 @@
                 .catch(e => console.log('Location check skipped'));
 
             // 2. Setup System Prompt
-            // Check if admin defined a profile, otherwise use default
             const storedProfile = JSON.parse(localStorage.getItem('userProfile'));
             const profile = storedProfile || defaultProfile;
 
@@ -400,8 +403,8 @@
             conversationHistory.push({ role: "user", content: message });
 
             try {
-                // --- CALL NETLIFY FUNCTION ---
-                const response = await fetch('/.netlify/functions/chat', {
+                // --- CALL DEPLOYED NETLIFY FUNCTION ---
+                const response = await fetch(`${CHATBOT_API_URL}/.netlify/functions/chat`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ messages: conversationHistory })
