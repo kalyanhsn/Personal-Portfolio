@@ -9,6 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.2/marked.min.js"></script>
     
     <script type="module" src="https://unpkg.com/@splinetool/viewer@1.11.6/build/spline-viewer.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -49,18 +50,15 @@
         .bio-text-effect p { font-family: 'Bebas Neue', sans-serif; font-size: 40px; color: #e50914; letter-spacing: 5px; margin: 0; animation: pulse 1.5s infinite alternate; }
         @keyframes pulse { from { transform: scale(1); opacity: 0.8; } to { transform: scale(1.05); opacity: 1; } }
         
-        /* Profile Image Styles */
         .bio-photo-wrapper { display: flex; justify-content: center; margin-bottom: 30px; }
         .profile-photo {
             width: 250px; height: 250px; border-radius: 8px; object-fit: cover; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
             filter: grayscale(100%); transition: filter 0.5s ease-in-out, transform 0.3s ease-out, box-shadow 0.3s; cursor: pointer;
         }
-
         .profile-photo:hover { filter: grayscale(0%) hue-rotate(330deg); transform: scale(1.03); box-shadow: 0 8px 25px rgba(229, 9, 20, 0.7); }
 
         .bio-content { background: #1a1a1a; padding: 25px; border-radius: 8px; margin-bottom: 30px; line-height: 1.7; font-size: 17px; color: #ddd; border: 1px solid #333; }
 
-        /* Bottom Action Containers */
         .bottom-container { display: flex; gap: 20px; justify-content: center; }
         .qualification-section, .mailer-section { flex: 1; min-width: 250px; padding: 20px; border-radius: 8px; transition: transform 0.3s, box-shadow 0.3s; cursor: pointer; position: relative; height: 150px; display: flex; flex-direction: column; justify-content: space-between; align-items: flex-start; }
         .qualification-section:hover, .mailer-section:hover { transform: translateY(-8px); box-shadow: 0 15px 30px rgba(229, 9, 20, 0.4); }
@@ -73,18 +71,71 @@
         .qualification-section .icon-wrapper { color: #e50914; }
         .mailer-section .icon-wrapper { color: #fff; }
 
-
         /* --- CONTENT SECTIONS (General) --- */
         .content-section { visibility: hidden; opacity: 0; transition: opacity 0.5s ease-in-out, visibility 0.5s linear; pointer-events: none; padding: 100px 50px 50px 50px; min-height: 100vh; }
         .content-section.active { visibility: visible; opacity: 1; pointer-events: auto; }
         .section-title { font-size: 32px; margin-bottom: 30px; font-weight: bold; border-bottom: 2px solid #e50914; display: inline-block; padding-bottom: 10px; }
         
-        /* --- CHATBOT STYLES --- (Retained for functionality) */
+        /* --- CONTACT FORM STYLES --- */
+        .contact-wrapper { display: flex; flex-wrap: wrap; gap: 40px; max-width: 1000px; margin: 0 auto; }
+        .contact-form { flex: 1; min-width: 300px; background: #1a1a1a; padding: 30px; border-radius: 8px; border: 1px solid #333; }
+        .contact-info { flex: 1; min-width: 250px; padding-top: 20px; }
+        .contact-info p { margin-bottom: 15px; font-size: 16px; color: #b3b3b3; }
+        .contact-info strong { color: #fff; margin-right: 8px; }
+        .contact-info a { color: #e50914; text-decoration: none; transition: color 0.3s; }
+        .contact-info a:hover { color: #ff4f58; text-decoration: underline; }
+        
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-size: 14px; color: #b3b3b3; }
+        .form-group input, .form-group textarea { width: 100%; padding: 12px; background: #333; border: 1px solid #555; border-radius: 4px; color: #fff; font-size: 14px; }
+        .form-group textarea { min-height: 120px; resize: vertical; }
+        .form-group input:focus, .form-group textarea:focus { outline: none; border-color: #e50914; }
+
+        /* --- CHATBOT STYLES (Integrated & Themed) --- */
         @keyframes float { 0% { transform: translateY(0); } 50% { transform: translateY(-8px); } 100% { transform: translateY(0); } }
-        .chatbot-button { position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; background: #e50914; border-radius: 50%; border: none; cursor: pointer; z-index: 1001; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 4px 12px rgba(229, 9, 20, 0.4); transition: transform 0.2s ease-out, box-shadow 0.2s ease-out; }
+        
+        .chatbot-button { 
+            position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; 
+            background: #e50914; border-radius: 50%; border: none; cursor: pointer; 
+            z-index: 1001; display: flex; align-items: center; justify-content: center; 
+            font-size: 24px; color: white; box-shadow: 0 4px 12px rgba(229, 9, 20, 0.4); 
+            transition: transform 0.2s ease-out, box-shadow 0.2s ease-out; 
+        }
         .chatbot-button:hover { transform: translateY(-4px) scale(1.05); box-shadow: 0 8px 25px rgba(229, 9, 20, 0.8); background: #b00710; }
-        .chatbot-container { position: fixed; bottom: 100px; right: 30px; width: 350px; height: 500px; background: #181818; z-index: 1000; display: none; }
+        
+        .chatbot-container { 
+            position: fixed; bottom: 100px; right: 30px; width: 380px; height: 550px; 
+            background: #181818; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            z-index: 1000; display: none; flex-direction: column; overflow: hidden; border: 1px solid #333;
+        }
         .chatbot-container.active { display: flex; animation: float 4s ease-in-out infinite; }
+        
+        .chat-header { background: #e50914; padding: 15px 20px; color: white; display: flex; justify-content: space-between; align-items: center; }
+        .chat-header h3 { font-size: 18px; font-weight: bold; }
+        .chat-header .close-btn { cursor: pointer; background: none; border: none; color: white; font-size: 20px; }
+        
+        .chat-messages { flex: 1; overflow-y: auto; padding: 20px; background: #141414; display: flex; flex-direction: column; gap: 15px; }
+        
+        .message { display: flex; gap: 10px; max-width: 85%; }
+        .message.user { align-self: flex-end; flex-direction: row-reverse; }
+        .message.assistant { align-self: flex-start; }
+        
+        .message-content { padding: 12px 16px; border-radius: 12px; line-height: 1.5; font-size: 14px; word-wrap: break-word; }
+        .message.user .message-content { background: #e50914; color: white; border-bottom-right-radius: 2px; }
+        .message.assistant .message-content { background: #333; color: #ddd; border-bottom-left-radius: 2px; }
+        
+        .message-content p { margin-bottom: 8px; }
+        .message-content p:last-child { margin-bottom: 0; }
+        .message-content strong { color: #fff; font-weight: bold; }
+        
+        .chat-input-area { padding: 15px; background: #181818; border-top: 1px solid #333; display: flex; gap: 10px; }
+        .chat-input-area input { flex: 1; padding: 10px 15px; background: #333; border: 1px solid #444; border-radius: 20px; color: white; outline: none; }
+        .chat-input-area input:focus { border-color: #e50914; }
+        .chat-input-area button { background: #e50914; color: white; border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s; }
+        .chat-input-area button:hover { background: #b00710; }
+        .chat-input-area button:disabled { opacity: 0.5; cursor: not-allowed; }
+        
+        .typing-indicator { font-size: 12px; color: #888; padding: 0 20px 10px; display: none; font-style: italic; }
 
         /* --- MOBILE RESPONSIVE --- */
         @media (max-width: 768px) {
@@ -93,6 +144,7 @@
             .hero-buttons { justify-content: center; }
             .content-section { padding: 80px 20px 30px 20px; }
             .bottom-container { flex-direction: column; align-items: stretch; }
+            .chatbot-container { width: 90%; right: 5%; bottom: 90px; height: 60%; }
         }
     </style>
 </head>
@@ -195,21 +247,33 @@
         </div>
     </div>
 
-    <button class="chatbot-button" onclick="toggleChatbot()">💬</button>
+    <button class="chatbot-button" onclick="toggleChatbot()">
+        <i class="fas fa-comment-dots"></i>
+    </button>
+    
     <div class="chatbot-container" id="chatbot">
+        <div class="chat-header">
+            <h3><i class="fas fa-robot"></i> Sai's AI Assistant</h3>
+            <button class="close-btn" onclick="toggleChatbot()">×</button>
         </div>
+        <div class="chat-messages" id="chatMessages">
+            </div>
+        <div class="typing-indicator" id="typingIndicator">AI is thinking...</div>
+        <div class="chat-input-area">
+            <input type="text" id="chatbot-input" placeholder="Ask about my experience..." onkeypress="handleChatKeyPress(event)">
+            <button id="send-btn" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+        </div>
+    </div>
 
     <script>
-        // --- FIX: VIRTUAL HEIGHT CALCULATION (Definitively solves 100vh issues) ---
+        // --- VIRTUAL HEIGHT CALCULATION ---
         function setHeroHeight() {
             let vh = window.innerHeight;
             const heroElement = document.getElementById('home');
             if (heroElement) { heroElement.style.height = `${vh}px`; }
         }
-
         window.addEventListener('load', setHeroHeight);
         window.addEventListener('resize', setHeroHeight);
-
 
         // --- NAVIGATION LOGIC ---
         function showSection(sectionId) {
@@ -217,7 +281,6 @@
             const allSections = document.querySelectorAll('.content-section');
             const body = document.body;
             
-            // Handle external links directly
             if (sectionId === 'resume') { window.location.href = 'resume.html'; return; }
             if (sectionId === 'projects') { window.location.href = 'projects.html'; return; }
             
@@ -241,25 +304,143 @@
         window.addEventListener('load', () => { if (!document.querySelector('.content-section.active')) { document.body.classList.add('no-scroll'); } });
         window.addEventListener('scroll', () => { const navbar = document.getElementById('navbar'); if (window.scrollY > 50) { navbar.classList.add('scrolled'); } else { navbar.classList.remove('scrolled'); } });
 
-        // --- CHATBOT SCRIPTS (Minimal inclusion for functionality) ---
-        function initChatbotCanvas() { /* ... function body ... */ }
-        let isChatbotOpen = false;
-        function toggleChatbot() { /* ... function body ... */ }
-        function handleChatKeyPress(e) { /* ... function body ... */ }
-        function addMessage(text, isUser) { /* ... function body ... */ }
-        function showTyping() { /* ... function body ... */ }
-        function removeTyping() { /* ... function body ... */ }
-        function getBotResponse(input) { 
-            input = input.toLowerCase();
-            if (input.includes('contact') || input.includes('email') || input.includes('hire')) { setTimeout(() => showSection('contact'), 1500); return "You can reach him at hsnkalyan@gmail.com. I'll take you to the contact section now! 🚀"; }
-            return "I'm not sure about that, but Sai is a specialist in **Data Integration, SAP Reporting, and Cybersecurity**. Try asking about those topics!";
+        // --- CHATBOT LOGIC (Integrated with Netlify Functions) ---
+        let conversationHistory = [];
+        let userLocation = { city: "Unknown", country_name: "Unknown" };
+        let isChatInitialized = false;
+        let sessionId = Date.now().toString(36) + Math.random().toString(36).substr(2);
+
+        // Load Profile Data (Fallback or from LocalStorage)
+        const defaultProfile = {
+            fullName: "Sai Nrusimha Kalyan",
+            currentRole: "IT Software Engineer",
+            experience: "Specializing in Data Integration, Security, SAP, and Process Automation.",
+            skills: "Python, Java, SQL, Alteryx, Power Platform, Cybersecurity, ETL/ELT.",
+            projects: "E-Commerce Platform, Social Media App, Portfolio Website.",
+            email: "hsnkalyan@gmail.com"
+        };
+
+        function initChat() {
+            if (isChatInitialized) return;
+            
+            // 1. Fetch Location (Securely via Netlify Function)
+            fetch('/.netlify/functions/location')
+                .then(res => res.json())
+                .then(data => {
+                    if(data.city) {
+                        userLocation = data;
+                        console.log("Visitor location:", userLocation.city);
+                    }
+                })
+                .catch(e => console.log('Location check skipped'));
+
+            // 2. Setup System Prompt
+            // Check if admin defined a profile, otherwise use default
+            const storedProfile = JSON.parse(localStorage.getItem('userProfile'));
+            const profile = storedProfile || defaultProfile;
+
+            const systemPrompt = `You are an AI assistant representing ${profile.fullName}, a ${profile.currentRole}.
+            KNOWLEDGE BASE:
+            - Experience: ${profile.experience}
+            - Skills: ${profile.skills}
+            - Email: ${profile.email}
+            RULES: Answer in first person (as Sai). Be professional, concise, and friendly. 
+            If asked about location, the user is visiting from ${userLocation.city || 'Unknown'}.`;
+
+            conversationHistory.push({ role: "system", content: systemPrompt });
+            
+            // 3. Welcome Message
+            addMessage(`Hi! I'm Sai's AI assistant. Ask me anything about his projects or skills!`, 'assistant');
+            isChatInitialized = true;
         }
-        function sendMessage() { 
+
+        function toggleChatbot() {
+            const chatbot = document.getElementById('chatbot');
+            if (chatbot.style.display === 'flex') {
+                chatbot.style.display = 'none';
+                chatbot.classList.remove('active');
+            } else {
+                chatbot.style.display = 'flex';
+                chatbot.classList.add('active');
+                if (!isChatInitialized) initChat();
+            }
+        }
+
+        function handleChatKeyPress(e) {
+            if (e.key === 'Enter') sendMessage();
+        }
+
+        function addMessage(text, role) {
+            const container = document.getElementById('chatMessages');
+            const div = document.createElement('div');
+            div.className = `message ${role}`;
+            
+            // Use Marked.js if available, otherwise plain text
+            const contentHtml = (typeof marked !== 'undefined' && role === 'assistant') ? marked.parse(text) : `<p>${text}</p>`;
+            
+            div.innerHTML = `<div class="message-content">${contentHtml}</div>`;
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        async function sendMessage() {
             const input = document.getElementById('chatbot-input');
-            const text = input.value.trim();
-            if (!text) return;
-            addMessage(text, true); input.value = ''; showTyping();
-            setTimeout(() => { removeTyping(); const response = getBotResponse(text); addMessage(response, false); }, 1000);
+            const btn = document.getElementById('send-btn');
+            const message = input.value.trim();
+            const typingIndicator = document.getElementById('typingIndicator');
+            
+            if (!message) return;
+
+            // UI Updates
+            addMessage(message, 'user');
+            input.value = '';
+            btn.disabled = true;
+            typingIndicator.style.display = 'block';
+
+            conversationHistory.push({ role: "user", content: message });
+
+            try {
+                // --- CALL NETLIFY FUNCTION ---
+                const response = await fetch('/.netlify/functions/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ messages: conversationHistory })
+                });
+
+                if (!response.ok) throw new Error("Backend Error");
+                
+                const data = await response.json();
+                // Handle Groq API structure
+                const botReply = data.choices[0].message.content;
+
+                addMessage(botReply, 'assistant');
+                conversationHistory.push({ role: "assistant", content: botReply });
+                
+                // Navigation Helper
+                if (botReply.toLowerCase().includes('contact') || botReply.toLowerCase().includes('email')) {
+                    setTimeout(() => {
+                        addMessage("Would you like me to take you to the contact section? Just say 'yes'.", 'assistant');
+                    }, 1000);
+                }
+                
+                // Check for navigation confirmation
+                if (message.toLowerCase().includes('yes') && conversationHistory.length > 2) {
+                    const lastBotMsg = conversationHistory[conversationHistory.length - 2].content.toLowerCase();
+                    if (lastBotMsg.includes('contact')) {
+                        toggleChatbot();
+                        showSection('contact');
+                    }
+                }
+
+            } catch (error) {
+                console.error(error);
+                addMessage("❌ I'm having trouble reaching the server. Please try again later.", 'assistant');
+            }
+            
+            typingIndicator.style.display = 'none';
+            btn.disabled = false;
+            // Focus back on input
+            setTimeout(() => document.getElementById('chatbot-input').focus(), 100);
         }
 
         // --- CONTACT FORM HANDLER ---
@@ -277,20 +458,13 @@
                 const message = document.getElementById('contact-message').value;
                 
                 const subject = encodeURIComponent(`Portfolio Contact from ${name}`);
-                const body = encodeURIComponent(
-                    `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`
-                );
-                
+                const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`);
                 const mailtoLink = `mailto:hsnkalyan@gmail.com?subject=${subject}&body=${body}`;
                 
                 status.style.color = "#ffa500";
-                status.innerHTML = `
-                    ⚠️ Email client opened for sending.<br>
-                    <a href="${mailtoLink}" style="color: #e50914; text-decoration: underline; cursor: pointer;">Click here if your client didn't open</a>
-                `;
+                status.innerHTML = `⚠️ Email client opened.<br><a href="${mailtoLink}" style="color: #e50914; text-decoration: underline;">Click here if it didn't open</a>`;
                 
                 window.location.href = mailtoLink;
-                
                 btn.disabled = false;
                 btn.textContent = "Send Message";
             }, 1000);
